@@ -1,0 +1,9 @@
+ py -m venv venv  
+
+ venv\Scripts\activate
+
+ pip install -r requirements.txt
+
+ pip install --upgrade google-generativeai
+
+ python app.py

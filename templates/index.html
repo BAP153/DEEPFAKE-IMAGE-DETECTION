@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deepfake Image Detector</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="gradient-bg"></div>
+        <div class="particles" id="particles"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header with Animation -->
+        <header class="animate-in">
+            <div class="header-content">
+                <div class="logo-container">
+                    <div class="logo-animation">
+                        <i class="fas fa-eye logo-icon"></i>
+                        <div class="scan-line"></div>
+                    </div>
+                </div>
+                <h1 class="glitch" data-text="Deepfake Detector">Deepfake Detector</h1>
+                <p class="subtitle">
+                </p>
+            </div>
+            
+            <!-- User Menu -->
+            <div class="user-menu">
+                <button class="user-btn" id="userMenuBtn">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="userName">Account</span>
+                </button>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="user-info">
+                        <i class="fas fa-user"></i>
+                        <span id="userEmail">user@example.com</span>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" onclick="toggleHistory(); return false;">
+                        <i class="fas fa-history"></i>
+                        History
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" onclick="logout(); return false;">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <!-- Upload Section -->
+            <div class="upload-section animate-in-up">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-content">
+                        <div class="upload-icon-container">
+                            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            <div class="pulse-ring"></div>
+                            <div class="pulse-ring delay-1"></div>
+                            <div class="pulse-ring delay-2"></div>
+                        </div>
+                        <h3>Drop your image here</h3>
+                        <p>or <span class="browse-text">browse</span> to choose</p>
+                        <div class="supported-formats">
+                            <span class="format-badge">PNG</span>
+                            <span class="format-badge">JPG</span>
+                            <span class="format-badge">WEBP</span>
+                            <span class="format-badge">GIF</span>
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*" hidden>
+                </div>
+                
+                <!-- Image Preview with Effects -->
+                <div class="image-preview" id="imagePreview" style="display: none;">
+                    <div class="preview-container">
+                        <img id="previewImg" src="" alt="Preview">
+                        <div class="scan-overlay" id="scanOverlay"></div>
+                        <button class="remove-btn" id="removeBtn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="image-info">
+                        <span class="file-name" id="fileName"></span>
+                        <span class="file-size" id="fileSize"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analyze Button with Ripple Effect -->
+            <button class="analyze-btn" id="analyzeBtn" disabled>
+                <span class="btn-content">
+                    <i class="fas fa-microscope btn-icon"></i>
+                    <span class="btn-text">Analyze Image</span>
+                </span>
+                <div class="btn-loader">
+                    <div class="loader-dot"></div>
+                    <div class="loader-dot"></div>
+                    <div class="loader-dot"></div>
+                </div>
+                <div class="ripple"></div>
+            </button>
+
+            <!-- Analysis Progress -->
+            <div class="analysis-progress" id="analysisProgress" style="display: none;">
+                <div class="progress-stages">
+                    <div class="stage active" id="stage1">
+                        <i class="fas fa-upload"></i>
+                        <span>Uploading</span>
+                    </div>
+                    <div class="stage" id="stage2">
+                        <i class="fas fa-brain"></i>
+                        <span>Analyzing</span>
+                    </div>
+                    <div class="stage" id="stage3">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Complete</span>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <!-- Results Section with Animations -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <h2 class="results-title">
+                    <i class="fas fa-chart-line"></i>
+                    Analysis Results
+                </h2>
+                
+                <div class="result-cards">
+                    <!-- Main Result Card -->
+                    <div class="result-card main-result animate-scale">
+                        <div class="result-icon-container">
+                            <div class="result-icon" id="resultIcon">
+                                <i class="fas fa-question"></i>
+                            </div>
+                            <div class="result-icon-bg"></div>
+                        </div>
+                        <div class="result-content">
+                            <span class="result-label">Detection Result</span>
+                            <span class="result-value" id="detectionResult">Analyzing...</span>
+                        </div>
+                    </div>
+
+                    <!-- Confidence Meter Card -->
+                    <div class="result-card confidence-card animate-slide-left">
+                        <div class="circular-progress" id="circularProgress">
+                            <svg viewBox="0 0 100 100">
+                                <circle class="progress-bg" cx="50" cy="50" r="45"></circle>
+                                <circle class="progress-circle" id="progressCircle" cx="50" cy="50" r="45"></circle>
+                            </svg>
+                            <div class="progress-text">
+                                <span class="progress-value" id="confidenceValue">0</span>
+                                <span class="progress-label">%</span>
+                            </div>
+                        </div>
+                        <h3>Confidence Level</h3>
+                    </div>
+
+                    <!-- Evidence Card -->
+                    <div class="result-card evidence-card animate-slide-right">
+                        <h3><i class="fas fa-search"></i> Visual Evidence</h3>
+                        <div class="evidence-list" id="evidenceList">
+                            <!-- Evidence items will be added here -->
+                        </div>
+                    </div>
+
+                    <!-- Explanation Card -->
+                    <div class="result-card explanation-card animate-slide-up">
+                        <h3><i class="fas fa-info-circle"></i> Analysis Explanation</h3>
+                        <p id="explanationText" class="explanation-text"></p>
+                    </div>
+
+                    <!-- Suggestions Card -->
+                    <div class="result-card suggestions-card animate-slide-up delay-1">
+                        <h3><i class="fas fa-lightbulb"></i> Recommended Actions</h3>
+                        <div class="suggestions-list" id="suggestionsList">
+                            <!-- Suggestions will be added here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons animate-fade-in">
+                    <button class="action-btn secondary" onclick="location.reload()">
+                        <i class="fas fa-redo"></i>
+                        Analyze Another
+                    </button>
+                    <button class="action-btn primary" id="downloadReport">
+                        <i class="fas fa-download"></i>
+                        Download Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage" style="display: none;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="error-text"></span>
+                <button class="error-close" onclick="hideError()">×</button>
+            </div>
+        </main>
+
+        <!-- History Section -->
+        <div class="history-section" id="historySection">
+            <div class="history-header">
+                <h2><i class="fas fa-history"></i> Analysis History</h2>
+                <div class="history-controls">
+                    <button class="history-filter-btn active" data-filter="all">All</button>
+                    <button class="history-filter-btn" data-filter="real">Real</button>
+                    <button class="history-filter-btn" data-filter="ai">AI-Generated</button>
+                    <button class="history-filter-btn" data-filter="undetermined">Undetermined</button>
+                    <button class="clear-history-btn" id="clearHistoryBtn">
+                        <i class="fas fa-trash"></i> Clear History
+                    </button>
+                </div>
+            </div>
+            
+            <div class="history-grid" id="historyGrid">
+                <!-- History items will be added here -->
+            </div>
+            
+            <div class="empty-history" id="emptyHistory" style="display: none;">
+                <i class="fas fa-inbox"></i>
+                <p>No analysis history yet</p>
+                <span>Your analyzed images will appear here</span>
+            </div>
+        </div>
+
+        <!-- History Modal -->
+        <div class="modal" id="historyModal">
+            <div class="modal-content">
+                <span class="modal-close" id="modalClose">&times;</span>
+                <div class="modal-body" id="modalBody">
+                    <!-- Modal content will be inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- History Toggle Button -->
+        <button class="history-toggle-btn" id="historyToggleBtn">
+            <i class="fas fa-history"></i>
+            <span>History</span>
+            <span class="history-count" id="historyCount">0</span>
+        </button>
+
+        <footer class="animate-in">
+            <div class="footer-content">
+                <p>&copy; 2023 Your Company. All rights reserved.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Success Toast -->
+    <div class="toast" id="successToast">
+        <i class="fas fa-check-circle"></i>
+        <span>Analysis completed successfully!</span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
